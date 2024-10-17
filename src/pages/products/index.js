@@ -95,9 +95,7 @@ function ProductsPage({ products }) {
   return (
     <>
       <div className="flex justify-between items-center bg-blue-500 px-5 py-4">
-        <h1 className="text-xl">
-          Welcome, {username.substring(0, username.indexOf("@"))}
-        </h1>
+        <h1 className="text-xl">Welcome, {username}</h1>
         <div className="w-[380px]">
           <input
             type="text"
