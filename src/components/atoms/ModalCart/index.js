@@ -10,7 +10,23 @@ const ModalCart = ({ handleCloseCart, handleCheckout, cart }) => {
     "Credit Card"
   );
 
+  const shippingAddresses = [
+    {
+      id: 1,
+      label: "111 Second St, Midtown, UK",
+      value: "111 Second St, Midtown, UK",
+    },
+    {
+      id: 2,
+      label: "123 Main St, Downtown, USA",
+      value: "123 Main St, Downtown, USA",
+    },
+    // Add more address options as needed
+  ];
+  const [selectedShippingAddress, setSelectedShippingAddress] = useState(null); // Initialize with null or a default address
+
   useEffect(() => {
+    // setSelectedShippingAddress(shippingAddresses[0]);
     async function loadImages() {
       const urls = {};
       for (const item of cart) {
@@ -36,20 +52,25 @@ const ModalCart = ({ handleCloseCart, handleCheckout, cart }) => {
   };
 
   const handlePayment = async (paymentRequestBody) => {
-    console.log("paymentRequestBody: ", paymentRequestBody);
     try {
       const orderResponse = await purchaseOrder(paymentRequestBody);
       console.log("Order placed successfully:", orderResponse);
       // Handle success (e.g., show a success message, redirect to order confirmation page)
     } catch (error) {
       // Handle error (e.g., show an error message)
-      console.log(error);
+      console.error("Error placing order:", error);
     }
+  };
+
+  const handleAddressChange = (event) => {
+    const selectedAddress = event.target.value;
+    setSelectedShippingAddress(selectedAddress);
+    console.log("selectedAddress: ", selectedShippingAddress);
   };
 
   const paymentRequestBody = {
     customerId: 1,
-    shippingAddress: "111 Second St, Midtown, UK",
+    shippingAddress: selectedShippingAddress || shippingAddresses[0]?.value,
     orderStatus: "PENDING",
     orderDetails: cart.map((item) => ({
       productId: item.id,
@@ -100,6 +121,25 @@ const ModalCart = ({ handleCloseCart, handleCheckout, cart }) => {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                <div className="mt-4">
+                  <label htmlFor="shippingAddress" className="font-semibold">
+                    Select Shipping Address:
+                  </label>
+                  <select
+                    id="shippingAddress"
+                    className="block w-full mt-1 p-2 border rounded-md"
+                    // value={selectedShippingAddress?.value || ""}
+                    onChange={handleAddressChange}
+                  >
+                    {/* <option value="">Select an address</option> */}
+                    {shippingAddresses.map((address) => (
+                      <option key={address.id} value={address.value}>
+                        {address.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="mt-4">
