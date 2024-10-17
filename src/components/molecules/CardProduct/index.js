@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { fetchImage } from '../../../services/images';
+import { useEffect, useState } from "react";
+import { fetchImage } from "../../../services/images";
 import Button from "@/components/atoms/Button";
 import React from "react";
 
@@ -49,15 +49,32 @@ function Body({ title, desc, onClick }) {
   );
 }
 
-function Footer({ price, onClick }) {
+function Footer({ price, onClick, userRole }) {
+  const [storedRole, setStoredRole] = useState(""); // Initialize with an empty string
+
+  useEffect(() => {
+    // Fetch the role from localStorage when the component mounts
+    const roleFromLocalStorage = localStorage.getItem("role");
+    setStoredRole(roleFromLocalStorage);
+  }, []);
+
+  const handleButtonClick = () => {
+    if (storedRole === "customer") {
+      onClick();
+    } else {
+      // Handle other actions for owners (e.g., navigate to edit page)
+      console.log("Edit button clicked for owner");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center px-5 pb-5">
       <span className="text-2xl font-semibold mb-2">Price ${price}</span>
       <Button
-        size={"w-full"}
+        size="w-full"
         color="bg-blue-500"
-        textButton="Buy"
-        onClick={onClick}
+        textButton={storedRole === "owner" ? "Edit" : "Buy"}
+        onClick={handleButtonClick}
       />
     </div>
   );

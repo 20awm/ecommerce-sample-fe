@@ -21,5 +21,6 @@ export async function login(payload) {
 export const getEmail = (token) => {
   console.log("Token:", token);
   const decodedToken = jwtDecode(token);
+  localStorage.setItem("role", decodedToken.role);
   return decodedToken.name;
 };

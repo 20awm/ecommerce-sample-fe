@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Button from "../Button"; // Make sure to import your Button component
 import formatCurrency from "@/helpers/utils/formatCurrency";
-import { fetchImage } from "../../../services/images"; // Import your image fetching function
+import { fetchImage } from "@/services/images"; // Import your image fetching function
 import { purchaseOrder } from "@/services/purchase";
 
-const ModalCart = ({ handleCloseCart, handleCheckout, cart }) => {
+const ModalCart = ({ handleCloseCart, cart }) => {
   const [imageUrls, setImageUrls] = useState({});
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
     "Credit Card"

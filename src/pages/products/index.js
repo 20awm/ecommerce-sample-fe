@@ -18,7 +18,13 @@ function ProductsPage({ products }) {
   const [showModalCart, setShowModalCart] = useState(false);
   const [imageUrls, setImageUrls] = useState({});
   const router = useRouter();
-  console.log("products response: ", products);
+  const [storedRole, setStoredRole] = useState(""); // Initialize with an empty string
+
+  useEffect(() => {
+    // Fetch the role from localStorage when the component mounts
+    const roleFromLocalStorage = localStorage.getItem("role");
+    setStoredRole(roleFromLocalStorage);
+  }, []);
 
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart"));
@@ -63,6 +69,10 @@ function ProductsPage({ products }) {
     window.location.href = "/login";
   };
 
+  const handleEdit = () => {
+    console.log("Edit button is clicked");
+  };
+  
   const handleAddToCart = useCallback(
     (productId) => {
       setCart((prevCart) => {
