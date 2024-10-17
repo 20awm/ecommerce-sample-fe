@@ -2,11 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   // basePath: "/home",
-  // images: {
-  //   remotePatterns: [{
-
-  //   }]
-  // }
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

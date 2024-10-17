@@ -7,6 +7,7 @@ import { getProducts } from "@/services/products";
 import useLogin from "@/hooks/useLogin";
 import formatCurrency from "@/helpers/utils/formatCurrency";
 import Modal from "@/components/atoms/Modal";
+import ModalCart from "@/components/atoms/ModalCart";
 
 function ProductsPage({ products }) {
   const username = useLogin();
@@ -14,6 +15,7 @@ function ProductsPage({ products }) {
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showModalCart, setShowModalCart] = useState(false);
   const [imageUrls, setImageUrls] = useState({});
   const router = useRouter();
   console.log("products response: ", products);
@@ -51,24 +53,59 @@ function ProductsPage({ products }) {
     setShowModal(false);
   };
 
+  const handleCloseCart = () => {
+    setShowModalCart(false);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("cart");
     window.location.href = "/login";
   };
 
-  const handleAddToCart = useCallback((productId) => {
+  const handleAddToCart = useCallback(
+    (productId) => {
+      setCart((prevCart) => {
+        const existingItem = prevCart.find((item) => item.id === productId);
+        if (existingItem) {
+          return prevCart.map((item) =>
+            item.id === productId ? { ...item, qty: item.qty + 1 } : item
+          );
+        } else {
+          const product = products.find(
+            (product) => product.productId === productId
+          );
+          if (product) {
+            const newItem = {
+              id: productId,
+              qty: 1,
+              name: product.name,
+              price: product.price,
+              imageUrl: product.imageUrl,
+            };
+            return [...prevCart, newItem];
+          }
+        }
+        return prevCart;
+      });
+    },
+    [products]
+  );
+
+  const handleReduceQuantity = (productId) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === productId);
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.id === productId ? { ...item, qty: item.qty + 1 } : item
-        );
-      } else {
-        return [...prevCart, { id: productId, qty: 1 }];
-      }
+      const updatedCart = prevCart.map((item) => {
+        if (item.id === productId) {
+          // Decrease quantity by 1 (ensure it doesn't go below zero)
+          const newQty = Math.max(item.qty - 1, 0);
+          return { ...item, qty: newQty };
+        }
+        return item;
+      });
+      // Remove items with zero quantity
+      return updatedCart.filter((item) => item.qty > 0);
     });
-  }, []);
+  };
 
   const handleProductClick = (productId) => {
     router.push(`/products/${productId}`);
@@ -179,18 +216,42 @@ function ProductsPage({ products }) {
                       </div>
                       <div className="flex flex-col justify-center items-center">
                         <span className="mb-1">Qty</span>
+                        <button
+                          className="text-lg font-bold"
+                          onClick={() => handleAddToCart(item.id)}
+                        >
+                          +
+                        </button>
                         <span className="flex-justify-center items-center font-semibold p-2 border rounded-sm text-center w-10 h-10">
                           {item.qty}
                         </span>
+                        <button
+                          className="text-lg font-bold"
+                          onClick={() => handleReduceQuantity(item.id)}
+                        >
+                          -
+                        </button>
                       </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="flex justify-between px-4 py-2 border mt-2">
-              <span className="font-semibold">Total</span>
-              <span className="font-semibold">{formatCurrency(cartTotal)}</span>
+            <div className="flex justify-between px-4 py-2 border mt-2 rounded-lg">
+              <span className="font-bold mt-1 text-lg">Total</span>
+              <span className="font-semibold mt-2">
+                {formatCurrency(cartTotal)}
+              </span>
+              <Button
+                color="bg-blue-500"
+                textButton="Checkout"
+                onClick={() => {
+                  setShowModalCart(true);
+                }}
+              />
+              {showModalCart && (
+                <ModalCart handleCloseCart={handleCloseCart} cart={cart} />
+              )}
             </div>
           </div>
         )}
